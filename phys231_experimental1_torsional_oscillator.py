@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt # graphing
 #from google.colab import drive
 #drive.mount('/content/drive')
 sheet_id = "1DCE2fU1IOOTACkmHYz2ftKtwC3b9D0dsWxzaMWUdH2w"
-#%%
+
 #for editing google sheets directly from python (we don't need to do that here I don't think)
 
 #from google.colab import auth
@@ -47,15 +47,21 @@ ax.legend(loc='lower right')
 plt.rcParams["figure.figsize"] = (16,9)
 plt.show()
 '''
-#%%
+
 # I have defined a function that allows you to put in set a dataframe =driveSheetToDF(Sheet_id, Sheet_Name) and it will return a df
 def driveSheetToDF(Sheet_id, Sheet_Name):
   Sheet_url = f"https://docs.google.com/spreadsheets/d/{Sheet_id}/gviz/tq?tqx=out:csv&sheet={Sheet_Name}"
   New_df_name = pd.read_csv(Sheet_url)
   return(New_df_name)
   driveSheetToDF()
-  
-#%%
+
+def deleteRowsDF(ExtraTime,Temp_df,ColumnToShorten):
+  NRows = int(ExtraTime * 50)
+  Temp_df = Temp_df.drop(range(0,NRows), axis=0)
+  Temp_df[ColumnToShorten] = Temp_df[ColumnToShorten] - ExtraTime
+  return(Temp_df)
+  deleteRowsDF()
+
 """#September 7, 2023"""
 
 #linear fit from graph of
@@ -98,7 +104,6 @@ plt.errorbar(Correctional_Offset_Rad, Correctional_Offset_Voltage,
              fmt ='o')
 plt.show()
 
-#%%
 """#Thursday, September 14, 2023
 
 Attached "sighting wire" plastic to apparatus
@@ -182,7 +187,6 @@ Gravity = the slope of the linear fit of the Forces / Masses
 gravity = 9.867
 gravity_uncert = 0.0277
 
-#%%
 """##Calculate K the Torsion Constant 'Spring Constant' of the fiber.
 
 Torque = mass * Gravity * radius
@@ -224,7 +228,7 @@ plt.errorbar(K_Torque,RadianDisplacement,
 plt.show()
 
 
-#%%
+
 """#Monday September 18, 2023
 
 To Achieve a consistent 'release' using a DC Power Supply hooked up to Helmholtz Coil Drive.
@@ -274,7 +278,7 @@ CD2_df = driveSheetToDF(sheet_id,"ControlDamping2")
 # oscillation starts at 2.08 seconds (row 106 in google sheets) First 2 rows are Python counting starting at 0 and header row.
 CD2_df = CD2_df.drop(CD2_df.index[:104]) #drop rows of noise before oscilation starts.
 CD2_df['Time'] = CD2_df['Time']-2.08 # set time to reflect dropped rows.
-CD2_df.head(5)
+#CD2_df.head(5)
 
 #Control 3
 CD3_df = driveSheetToDF(sheet_id,"ControlDamping3")
@@ -283,24 +287,45 @@ CD3_df = CD3_df.drop(CD3_df.index[:151]) #drop rows of noise before oscilation s
 CD3_df['Time'] = CD3_df['Time']-3.02 # set time to reflect dropped rows.
 CD3_df.head(5)
 
+"""Wrote a function to delete extra time before the trial starts.
+called deleteRowsDF.
+
+it takes three arguments? (I think that is the right word)
+1. ammount of time to delete
+2. Data Frame to delete from
+3. Which column is to be shortened.
+"""
+
+CD3_df = driveSheetToDF(sheet_id,"ControlDamping3")
+CD3_df = deleteRowsDF(3.02,CD3_df,'Time')
+CD3_df.head(5)
+
 #Copied from Terry's Python_Plot&DataAnalysis.ipynb
 
 fig, ax = plt.subplots()
 txt = 'black'
-p1 = ax.plot(CD1_df['Time'], CD1_df['Position'], label = 'Control 1')
-p2 = ax.plot(CD2_df['Time'], CD2_df['Position'],  color = 'black', label = 'Control 2')
-p3 = ax.plot(CD3_df['Time'], CD3_df['Position'],  color = 'red', label = 'Control 3')
+p1 = ax.plot(CD1_df['Time'], CD1_df['Position'], color = 'blue', label = 'Control 1')
+p2 = ax.plot(CD2_df['Time'], CD2_df['Position'], color = 'black', label = 'Control 2')
+p3 = ax.plot(CD3_df['Time'], CD3_df['Position'], color = 'red', label = 'Control 3')
 #p2 = ax.plot(ddate, fit, color = 'black', label = 'Linear Fit')
 #p3 = ax.fill_between(ddate, fit-PI_68, fit+PI_68, color = 'orange', label = r'1$\sigma$ PI')
 #p4 = ax.fill_between(ddate, fit-CI_95, fit+CI_95, color = 'yellow', label = r'2$\sigma$ CI')
-ax.set_ylabel(r'Position in Radians', color=txt, fontsize=16)
+ax.set_ylabel(r'Position in Volts (Radians)', color=txt, fontsize=16)
 ax.set_xlabel(r'Time', color=txt, fontsize=16)
-ax.set_title(r'Control - Position vs Time', color=txt, fontsize = 18)
+ax.set_title(r'Torsional Oscillator Control Decay - Position vs Time', color=txt, fontsize = 18)
 ax.tick_params(axis='x', labelsize=16, colors=txt)
 ax.tick_params(axis='y', labelsize=16, colors=txt)
 ax.legend(loc='lower right')
 plt.rcParams["figure.figsize"] = (16,9)
 plt.show()
+
+"""Maybe find peaks with scipy.signal.find_peaks
+
+https://plotly.com/python/peak-finding/
+
+"""
+
+
 
 """### String Damping
 
@@ -312,40 +337,50 @@ plt.show()
 #sheet_name = "stringdamping101"
 #StringDamping101_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
 #SD101_df = pd.read_csv(StringDamping101_url)
-SD101_df = driveSheetToDF(sheet_id,"stringdamping101")
 
+SD101_df = driveSheetToDF(sheet_id,"stringdamping101") #oscilation starts at 1.10 (row 56)
+SD101_df = deleteRowsDF(1.10,SD101_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
+SD101_df.head(5)
 
 #StringDamping102
+#100g (50g per side) test 2
 SD102_df = driveSheetToDF(sheet_id,"stringdamping102")
+SD102_df = deleteRowsDF(0.98,SD102_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
+#SD102_df.head(5)
 
 #StringDamping103
+#100g (50g per side) test 3
 SD103_df = driveSheetToDF(sheet_id,"stringdamping103")
-
-#SD101_df.head(5)
+SD103_df = deleteRowsDF(1.62,SD103_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
+#SD103_df.head(5)
 
 #StringDamping201
 #200g (100g per side) test 1
 SD201_df = driveSheetToDF(sheet_id, "stringdamping201")
+SD201_df = deleteRowsDF(1.54,SD201_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
 
 #StringDamping202
+#Time 1.12 or 1.2??
 SD202_df  = driveSheetToDF(sheet_id, "stringdamping202")
+SD202_df = deleteRowsDF(1.12,SD202_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
 
 #StringDamping203
 SD203_df = driveSheetToDF(sheet_id, "stringdamping203")
+SD203_df = deleteRowsDF( 0.90,SD203_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
 
 #Copied from Terry's Python_Plot&DataAnalysis.ipynb
 
 fig, ax = plt.subplots()
 txt = 'black'
-p1 = ax.plot(SD201_df['Time'], SD201_df['Position'], label = '200g Mass')
-p2 = ax.plot(SD202_df['Time'], SD202_df['Position'],  color = 'black', label = '200g mass')
-p3 = ax.plot(SD203_df['Time'], SD203_df['Position'],  color = 'red', label = '200g mass')
+p1 = ax.plot(SD201_df['Time'], SD201_df['Position'], color = 'blue', label = '200g Mass 1')
+p2 = ax.plot(SD202_df['Time'], SD202_df['Position'], color = 'black', label = '200g mass 2')
+p3 = ax.plot(SD203_df['Time'], SD203_df['Position'], color = 'red', label = '200g mass 3')
 #p2 = ax.plot(ddate, fit, color = 'black', label = 'Linear Fit')
 #p3 = ax.fill_between(ddate, fit-PI_68, fit+PI_68, color = 'orange', label = r'1$\sigma$ PI')
 #p4 = ax.fill_between(ddate, fit-CI_95, fit+CI_95, color = 'yellow', label = r'2$\sigma$ CI')
-ax.set_ylabel(r'Position in Radians', color=txt, fontsize=16)
+ax.set_ylabel(r'Position in Volts (Radians)', color=txt, fontsize=16)
 ax.set_xlabel(r'Time', color=txt, fontsize=16)
-ax.set_title(r'String Damping - Position vs Time', color=txt, fontsize = 18)
+ax.set_title(r'Torsional Oscillator String Damping - Position vs Time 200g Trials', color=txt, fontsize = 18)
 ax.tick_params(axis='x', labelsize=16, colors=txt)
 ax.tick_params(axis='y', labelsize=16, colors=txt)
 ax.legend(loc='lower right')
@@ -355,36 +390,81 @@ plt.show()
 #StringDamping301
 #300g (150g per side) test 1
 SD301_df = driveSheetToDF(sheet_id, "stringdamping301")
+SD301_df = deleteRowsDF(0.40,SD301_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
 
 #StringDamping302
 SD302_df = driveSheetToDF(sheet_id, "stringdamping302")
+SD302_df = deleteRowsDF(0.70,SD302_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
 
 #StringDamping303
 SD303_df= driveSheetToDF(sheet_id, "stringdamping303")
-
-#StringDamping401
-#400g (200g per side) test 1
-SD401_df = driveSheetToDF(sheet_id, "stringdamping401")
-
-#StringDamping402
-SD402_df = driveSheetToDF(sheet_id, "stringdamping402")
-
-#StringDamping403
-SD403_df = driveSheetToDF(sheet_id, "stringdamping403")
+SD303_df = deleteRowsDF(0.62,SD303_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
 
 #Copied from Terry's Python_Plot&DataAnalysis.ipynb
 
 fig, ax = plt.subplots()
 txt = 'black'
-p1 = ax.plot(SD101_df['Time'], SD101_df['Position'], label = '100g Mass')
-p2 = ax.plot(SD202_df['Time'], SD202_df['Position'],  color = 'black', label = '200g mass')
-p3 = ax.plot(SD303_df['Time'], SD303_df['Position'],  color = 'red', label = '300g mass')
+p1 = ax.plot(SD301_df['Time'], SD301_df['Position'], color = 'blue', label = '300g Mass 1')
+p2 = ax.plot(SD302_df['Time'], SD302_df['Position'], color = 'black', label = '300g mass 2')
+p3 = ax.plot(SD303_df['Time'], SD303_df['Position'], color = 'red', label = '300g mass 3')
 #p2 = ax.plot(ddate, fit, color = 'black', label = 'Linear Fit')
 #p3 = ax.fill_between(ddate, fit-PI_68, fit+PI_68, color = 'orange', label = r'1$\sigma$ PI')
 #p4 = ax.fill_between(ddate, fit-CI_95, fit+CI_95, color = 'yellow', label = r'2$\sigma$ CI')
-ax.set_ylabel(r'Position in Radians', color=txt, fontsize=16)
+ax.set_ylabel(r'Position in Volts (Radians)', color=txt, fontsize=16)
 ax.set_xlabel(r'Time', color=txt, fontsize=16)
-ax.set_title(r'String Damping - Position vs Time', color=txt, fontsize = 18)
+ax.set_title(r'Torsional Oscillator String Damping - Position vs Time 300g Trials', color=txt, fontsize = 18)
+ax.tick_params(axis='x', labelsize=16, colors=txt)
+ax.tick_params(axis='y', labelsize=16, colors=txt)
+ax.legend(loc='lower right')
+plt.rcParams["figure.figsize"] = (16,9)
+plt.show()
+
+#StringDamping401
+#400g (200g per side) test 1
+SD401_df = driveSheetToDF(sheet_id, "stringdamping401")
+SD401_df = deleteRowsDF(0.80,SD401_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
+
+#StringDamping402
+SD402_df = driveSheetToDF(sheet_id, "stringdamping402")
+SD402_df = deleteRowsDF(1.22,SD402_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
+
+#StringDamping403
+SD403_df = driveSheetToDF(sheet_id, "stringdamping403")
+SD403_df = deleteRowsDF(0.98,SD403_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
+
+#Copied from Terry's Python_Plot&DataAnalysis.ipynb
+
+fig, ax = plt.subplots()
+txt = 'black'
+p1 = ax.plot(SD401_df['Time'], SD401_df['Position'], color = 'blue', label = '400g Mass 1')
+p2 = ax.plot(SD402_df['Time'], SD402_df['Position'], color = 'black', label = '400g mass 2')
+p3 = ax.plot(SD403_df['Time'], SD403_df['Position'], color = 'red', label = '400g mass 3')
+#p2 = ax.plot(ddate, fit, color = 'black', label = 'Linear Fit')
+#p3 = ax.fill_between(ddate, fit-PI_68, fit+PI_68, color = 'orange', label = r'1$\sigma$ PI')
+#p4 = ax.fill_between(ddate, fit-CI_95, fit+CI_95, color = 'yellow', label = r'2$\sigma$ CI')
+ax.set_ylabel(r'Position in Volts (Radians)', color=txt, fontsize=16)
+ax.set_xlabel(r'Time', color=txt, fontsize=16)
+ax.set_title(r'Torsional Oscillator String Damping - Position vs Time 400g Trials', color=txt, fontsize = 18)
+ax.tick_params(axis='x', labelsize=16, colors=txt)
+ax.tick_params(axis='y', labelsize=16, colors=txt)
+ax.legend(loc='lower right')
+plt.rcParams["figure.figsize"] = (16,9)
+plt.show()
+
+#Copied from Terry's Python_Plot&DataAnalysis.ipynb
+
+fig, ax = plt.subplots()
+txt = 'black'
+p1 = ax.plot(SD101_df['Time'], SD101_df['Position'], color = 'blue', label = '100g Mass')
+p2 = ax.plot(SD201_df['Time'], SD201_df['Position'], color = 'black', label = '200g mass')
+p3 = ax.plot(SD301_df['Time'], SD301_df['Position'], color = 'red', label = '300g mass')
+p4 = ax.plot(SD401_df['Time'], SD401_df['Position'], color = 'green', label = '400g mass')
+#p2 = ax.plot(ddate, fit, color = 'black', label = 'Linear Fit')
+#p3 = ax.fill_between(ddate, fit-PI_68, fit+PI_68, color = 'orange', label = r'1$\sigma$ PI')
+#p4 = ax.fill_between(ddate, fit-CI_95, fit+CI_95, color = 'yellow', label = r'2$\sigma$ CI')
+ax.set_ylabel(r'Position in Volts (Radians)', color=txt, fontsize=16)
+ax.set_xlabel(r'Time', color=txt, fontsize=16)
+ax.set_title(r'Torsional Oscillator String Damping - Position vs Time', color=txt, fontsize = 18)
 ax.tick_params(axis='x', labelsize=16, colors=txt)
 ax.tick_params(axis='y', labelsize=16, colors=txt)
 ax.legend(loc='lower right')
@@ -412,45 +492,82 @@ R side 11 full turns from outside edge to fully over
 
 #Magnetic Damping 01
 MD01_df = driveSheetToDF(sheet_id, "magdamping01")
+MD01_df = deleteRowsDF(0.88,MD01_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
+
 
 #Magnetic Damping 02
 MD02_df = driveSheetToDF(sheet_id, "magdamping02")
+MD02_df = deleteRowsDF(0.64,MD02_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
+
 
 #Magnetic Damping 03
 MD03_df = driveSheetToDF(sheet_id, "magdamping03")
+MD03_df = deleteRowsDF(1.28,MD03_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
 
 #magdamping2751
 
 #Magnetic Damping 2.75 turns 1
 MD2751_df = driveSheetToDF(sheet_id, "magdamping2751")
+MD2751_df = deleteRowsDF(1.36,MD2751_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
 
 #Magnetic Damping 2.75 turns 2
+#Not sure about where to cut this one. Lots of noise in beginning.
 MD2752_df = driveSheetToDF(sheet_id, "magdamping2752")
+MD2752_df = deleteRowsDF(1.08,MD2752_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
 
 #Magnetic Damping 2.75 turns 3
 MD2753_df = driveSheetToDF(sheet_id, "magdamping2753")
+MD2753_df = deleteRowsDF(1.00,MD2753_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
 
 #magdamping5501
 
 #Magnetic Damping 5.50 turns 1
 MD5501_df = driveSheetToDF(sheet_id, "magdamping5501")
+MD5501_df = deleteRowsDF(0.98,MD5501_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
+
 
 #Magnetic Damping 5.50 turns 2
 MD5502_df = driveSheetToDF(sheet_id, "magdamping5502")
+MD5502_df = deleteRowsDF(0.94,MD5502_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
+
 
 #Magnetic Damping 5.50 turns 3
+#Not sure about where to cut this one. Lots of noise in beginning.
 MD5503_df = driveSheetToDF(sheet_id, "magdamping5503")
+MD5503_df = deleteRowsDF(1.24,MD5503_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
 
 #magdamping8251
 
 #Magnetic Damping 8.25 turns 1
 MD8251_df = driveSheetToDF(sheet_id, "magdamping8251")
+MD8251_df = deleteRowsDF(0.86,MD8251_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
 
 #Magnetic Damping 8.25 turns 2
 MD8252_df = driveSheetToDF(sheet_id, "magdamping8252")
+MD8252_df = deleteRowsDF(0.86,MD8252_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
+
 
 #Magnetic Damping 8.25 turns 3
 MD8253_df = driveSheetToDF(sheet_id, "magdamping8253")
+MD8253_df = deleteRowsDF(0.78,MD8253_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
+
+fig, ax = plt.subplots()
+txt = 'black'
+p1 = ax.plot(MD01_df['Time'], MD01_df['Position'], label = 'Magnetic Damping 0 turns')
+p2 = ax.plot(MD2751_df['Time'], MD2751_df['Position'],  color = 'black', label = 'Magnetic Damping 2.75 turns')
+p3 = ax.plot(MD5501_df['Time'], MD5501_df['Position'],  color = 'green', label = 'Magnetic Damping 5.50 turns')
+p4 = ax.plot(MD8251_df['Time'], MD8251_df['Position'],  color = 'red', label = 'Magnetic Damping 8.25 turns')
+#p2 = ax.plot(ddate, fit, color = 'black', label = 'Linear Fit')
+#p3 = ax.fill_between(ddate, fit-PI_68, fit+PI_68, color = 'orange', label = r'1$\sigma$ PI')
+#p4 = ax.fill_between(ddate, fit-CI_95, fit+CI_95, color = 'yellow', label = r'2$\sigma$ CI')
+ax.set_ylabel(r'Position in Volts (Radians)', color=txt, fontsize=16)
+ax.set_xlabel(r'Time', color=txt, fontsize=16)
+ax.set_title(r'Torsional Oscillator Magnetic Damping - Position vs Time', color=txt, fontsize = 18)
+ax.tick_params(axis='x', labelsize=16, colors=txt)
+ax.tick_params(axis='y', labelsize=16, colors=txt)
+ax.legend(loc='lower right')
+plt.rcParams["figure.figsize"] = (16,9)
+plt.show()
 
 """After results from 8.25, we decided 11 Full turns of the magnetic dampers was not worthwile.
 
