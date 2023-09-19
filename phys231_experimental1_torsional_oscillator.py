@@ -516,6 +516,31 @@ MD02_df = deleteRowsDF(0.64,MD02_df,'Time') #drop extra rows before oscilation s
 MD03_df = driveSheetToDF(sheet_id, "magdamping03")
 MD03_df = deleteRowsDF(1.28,MD03_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
 
+#%%
+fig, ax = plt.subplots()
+txt = 'black'
+p1 = ax.plot(MD01_df['Time'], MD01_df['Position'], color = 'blue', label = 'Magnetic Damping 0 turns 1')
+p2 = ax.plot(MD02_df['Time'], MD02_df['Position'], color = 'black', label = 'Magnetic Damping 0 turns 2')
+p3 = ax.plot(MD03_df['Time'], MD03_df['Position'], color = 'red', label = 'Magnetic Damping 0 turns 3')
+#p2 = ax.plot(ddate, fit, color = 'black', label = 'Linear Fit')
+#p3 = ax.fill_between(ddate, fit-PI_68, fit+PI_68, color = 'orange', label = r'1$\sigma$ PI')
+#p4 = ax.fill_between(ddate, fit-CI_95, fit+CI_95, color = 'yellow', label = r'2$\sigma$ CI')
+ax.set_ylabel(r'Position in Volts (Radians)', color=txt, fontsize=16)
+ax.set_xlabel(r'Time', color=txt, fontsize=16)
+ax.set_title(r'Torsional Oscillator Magnetic Damping - Position vs Time 0 Turns', color=txt, fontsize = 18)
+ax.tick_params(axis='x', labelsize=16, colors=txt)
+ax.tick_params(axis='y', labelsize=16, colors=txt)
+ax.legend(loc='lower right')
+plt.rcParams["figure.figsize"] = (16,9)
+plt.show()
+
+"""After results from 8.25, we decided 11 Full turns of the magnetic dampers was not worthwile.
+
+We may want some data at 1 turns, 2 turns, 3 turns, 4 turns. etc.
+"""
+
+#%% cell break
+
 #magdamping2751
 
 #Magnetic Damping 2.75 turns 1
@@ -563,6 +588,7 @@ MD8252_df = deleteRowsDF(0.86,MD8252_df,'Time') #drop extra rows before oscilati
 MD8253_df = driveSheetToDF(sheet_id, "magdamping8253")
 MD8253_df = deleteRowsDF(0.78,MD8253_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
 
+#%%
 fig, ax = plt.subplots()
 txt = 'black'
 p1 = ax.plot(MD01_df['Time'], MD01_df['Position'], label = 'Magnetic Damping 0 turns')
