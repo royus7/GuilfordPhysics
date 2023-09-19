@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt # graphing
 #from google.colab import drive
 #drive.mount('/content/drive')
 sheet_id = "1DCE2fU1IOOTACkmHYz2ftKtwC3b9D0dsWxzaMWUdH2w"
-
+#%%
 #for editing google sheets directly from python (we don't need to do that here I don't think)
 
 #from google.colab import auth
@@ -47,14 +47,15 @@ ax.legend(loc='lower right')
 plt.rcParams["figure.figsize"] = (16,9)
 plt.show()
 '''
-
+#%%
 # I have defined a function that allows you to put in set a dataframe =driveSheetToDF(Sheet_id, Sheet_Name) and it will return a df
 def driveSheetToDF(Sheet_id, Sheet_Name):
   Sheet_url = f"https://docs.google.com/spreadsheets/d/{Sheet_id}/gviz/tq?tqx=out:csv&sheet={Sheet_Name}"
   New_df_name = pd.read_csv(Sheet_url)
   return(New_df_name)
   driveSheetToDF()
-
+  
+#%%
 """#September 7, 2023"""
 
 #linear fit from graph of
@@ -97,6 +98,7 @@ plt.errorbar(Correctional_Offset_Rad, Correctional_Offset_Voltage,
              fmt ='o')
 plt.show()
 
+#%%
 """#Thursday, September 14, 2023
 
 Attached "sighting wire" plastic to apparatus
@@ -180,6 +182,7 @@ Gravity = the slope of the linear fit of the Forces / Masses
 gravity = 9.867
 gravity_uncert = 0.0277
 
+#%%
 """##Calculate K the Torsion Constant 'Spring Constant' of the fiber.
 
 Torque = mass * Gravity * radius
@@ -221,7 +224,7 @@ plt.errorbar(K_Torque,RadianDisplacement,
 plt.show()
 
 
-
+#%%
 """#Monday September 18, 2023
 
 To Achieve a consistent 'release' using a DC Power Supply hooked up to Helmholtz Coil Drive.
