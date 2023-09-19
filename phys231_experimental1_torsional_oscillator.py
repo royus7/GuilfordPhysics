@@ -62,6 +62,8 @@ def deleteRowsDF(ExtraTime,Temp_df,ColumnToShorten):
   return(Temp_df)
   deleteRowsDF()
 
+#%% cell
+
 """#September 7, 2023"""
 
 #linear fit from graph of
@@ -103,6 +105,8 @@ plt.errorbar(Correctional_Offset_Rad, Correctional_Offset_Voltage,
              yerr=Correctional_Offset_Voltage_uncert,
              fmt ='o')
 plt.show()
+
+#%% cell break
 
 """#Thursday, September 14, 2023
 
@@ -160,6 +164,8 @@ HangingMass_df.head(4)
 HangingMass_df = driveSheetToDF(sheet_id,"HangingMasses")
 HangingMass_df.head(4)
 
+#%% cell break
+
 """##Calculate G in room
 
 Force is calculated from the mean of 20 second data collections using a Dual range force sensor.
@@ -186,6 +192,8 @@ Gravity = the slope of the linear fit of the Forces / Masses
 
 gravity = 9.867
 gravity_uncert = 0.0277
+
+#%% cell break
 
 """##Calculate K the Torsion Constant 'Spring Constant' of the fiber.
 
@@ -227,7 +235,7 @@ plt.errorbar(K_Torque,RadianDisplacement,
          fmt ='o')
 plt.show()
 
-
+#%% cell break
 
 """#Monday September 18, 2023
 
@@ -253,6 +261,7 @@ Latest: angular velocity (V)
 ### Damping Control
 """
 
+#%% how to make a cell
 #Control 1
 sheet_id = "1DCE2fU1IOOTACkmHYz2ftKtwC3b9D0dsWxzaMWUdH2w"
 sheet_name_ControlDamping1 = "ControlDamping1"
@@ -325,7 +334,7 @@ https://plotly.com/python/peak-finding/
 
 """
 
-
+#%% how to make a cell
 
 """### String Damping
 
@@ -471,6 +480,8 @@ ax.legend(loc='lower right')
 plt.rcParams["figure.figsize"] = (16,9)
 plt.show()
 
+#%% cell break
+
 """### Magnetic Damping
 
 R side 11 full turns from outside edge to fully over
@@ -488,6 +499,7 @@ R side 11 full turns from outside edge to fully over
 11.00 Turns
 """
 
+#%% how to make a cell in Spyder.
 #Magnetic Damping
 
 #Magnetic Damping 01
@@ -571,6 +583,12 @@ plt.show()
 
 """After results from 8.25, we decided 11 Full turns of the magnetic dampers was not worthwile.
 
-### Fluid Damping
+We may want some data at 1 turns, 2 turns, 3 turns, 4 turns. etc.
+"""
+
+#%% cell break
+
+"""### Fluid Damping
+
 """
 
