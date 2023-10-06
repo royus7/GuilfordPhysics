@@ -74,17 +74,17 @@ Correctional_Offset_Rad_uncert = [0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05]
 Correctional_Offset_Voltage = [0.00, -0.7573, 0.7091, -1.558, 1.446, -2.152, 2.168] #plus or minus 0.003 y-intercepts
 Correctional_Offset_Voltage_uncert =[0.003, 0.004, 0.003, 0.001, 0.007, 0.002, 0.002] #Uncertainty of y-intercepts
 
-df = pd.DataFrame(list(zip(Correctional_Offset_Rad, Correctional_Offset_Rad_uncert, Correctional_Offset_Voltage, Correctional_Offset_Voltage_uncert)),
+Correctional_Offset_df = pd.DataFrame(list(zip(Correctional_Offset_Rad, Correctional_Offset_Rad_uncert, Correctional_Offset_Voltage, Correctional_Offset_Voltage_uncert)),
                columns =['Radians', 'Rad_Uncert', 'Voltage', 'Voltage_Uncert'])
 
-df
+Correctional_Offset_df
 
-plt.errorbar(df.Radians, df.Voltage, xerr=df.Rad_Uncert, yerr= df.Voltage_Uncert)
+plt.errorbar(Correctional_Offset_df.Radians, Correctional_Offset_df.Voltage, xerr=Correctional_Offset_df.Rad_Uncert, yerr= Correctional_Offset_df.Voltage_Uncert)
 
-df = df.sort_values('Radians')# sort in ascending order so graph does not bounce around.
-df
+Correctional_Offset_df = Correctional_Offset_df.sort_values('Radians')# sort in ascending order so graph does not bounce around.
+Correctional_Offset_df
 
-plt.errorbar(df.Radians, df.Voltage, xerr=df.Rad_Uncert, yerr= df.Voltage_Uncert)
+plt.errorbar(Correctional_Offset_df.Radians, Correctional_Offset_df.Voltage, xerr=Correctional_Offset_df.Rad_Uncert, yerr= Correctional_Offset_df.Voltage_Uncert)
 
 #plt.plot(Correctional_Offset_Rad, Correctional_Offset_Voltage, 'bo')
 plt.errorbar(Correctional_Offset_Rad, Correctional_Offset_Voltage,
@@ -95,7 +95,7 @@ plt.show()
 
 #Linear Regression using SciPy
 
-m, b, *_ = ss.linregress(df.Radians, df.Voltage)
+m, b, *_ = ss.linregress(Correctional_Offset_df.Radians, Correctional_Offset_df.Voltage)
 print(m)
 print(b)
 
