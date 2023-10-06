@@ -15,6 +15,7 @@ import numpy as np #numpy is for arrays and matricies operations
 import pandas as pd #Pandas is for data manipulation and analysis, esp structures and operations for manipulating numerical tables
 import scipy.stats as ss # stats
 import matplotlib.pyplot as plt # graphing
+from scipy.signal import find_peaks
 
 #from google.colab import drive
 #drive.mount('/content/drive')
@@ -128,7 +129,16 @@ $= 1.27x10^{-2} \pm 3x10^{-4}m  $
 rotor_shaft_radius = 0.0127
 rotor_shaft_radius_uncert = 0.0003
 
-"""## Hanging Masses
+"""Paddle Dimensions
+
+Front Paddle
+15.2cm wide x 11.3cm tall
+
+Back Paddle
+
+15.3cm wide x 11.3cm tall
+
+## Hanging Masses
 
 Each mass had an uncertainty measurement of 0.05g as measured by Isaac C.
 
@@ -328,11 +338,54 @@ ax.legend(loc='lower right')
 plt.rcParams["figure.figsize"] = (16,9)
 plt.show()
 
-"""Maybe find peaks with scipy.signal.find_peaks
+"""# Peak finding...
+
+Maybe find peaks with scipy.signal.find_peaks
 
 https://plotly.com/python/peak-finding/
 
 """
+
+peak, peakheights = find_peaks(CD1_df['Position'], height=0)
+ph  = peakheights['peak_heights']
+print(peak)
+
+print(ph)
+
+#print(np.shape(ph))
+#peaks, _ = find_peaks(x, height=0)
+plt.plot(CD1_df['Position'])
+plt.plot(peak, ph, "x")
+#plt.plot(np.zeros_like(peak), "--", color="gray")
+plt.show()
+
+'''
+x = CD1_df['Time']
+y = CD1_df['Position']
+
+#Find peaks
+peaks, _ = find_peaks(y)
+height = peaks[1]['peak_heights'] #list of the heights of the peaks
+peak_pos = x[peaks[0]] #list of the peaks positions
+#Finding the minima
+#y2 = y*-1
+#minima = find_peaks(y2)
+#min_pos = x[minima[0]] #list of the minima positions
+#min_height = y2[minima[0]] #list of the mirrored minima heights
+print(peaks)
+'''
+
+'''
+#Plotting
+fig = plt.figure()
+ax = fig.subplots()
+ax.plot(x,y)
+ax.scatter(peak_pos, height, color = 'r', s = 15, marker = 'D', label = 'Maxima')
+#ax.scatter(min_pos, min_height*-1, color = 'gold', s = 15, marker = 'X', label = 'Minima')
+ax.legend()
+ax.grid()
+plt.show()
+'''
 
 #%% how to make a cell
 
@@ -350,6 +403,14 @@ https://plotly.com/python/peak-finding/
 SD101_df = driveSheetToDF(sheet_id,"stringdamping101") #oscilation starts at 1.10 (row 56)
 SD101_df = deleteRowsDF(1.10,SD101_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
 SD101_df.head(5)
+
+peak, peakheights = find_peaks(SD101_df['Position'], height=0)
+ph  = peakheights['peak_heights']
+#print(np.shape(ph))
+#peaks, _ = find_peaks(x, height=0)
+plt.plot(SD101_df['Position'])
+plt.plot(peak, ph, "x")
+plt.show()
 
 #StringDamping102
 #100g (50g per side) test 2
@@ -443,20 +504,63 @@ SD403_df = deleteRowsDF(0.98,SD403_df,'Time') #drop extra rows before oscilation
 
 #Copied from Terry's Python_Plot&DataAnalysis.ipynb
 
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(2, 2)
+#plt.subplots_adjust(left=.1, right=.2, bottom=.1, top=.2)
 txt = 'black'
-p1 = ax.plot(SD401_df['Time'], SD401_df['Position'], color = 'blue', label = '400g Mass 1')
-p2 = ax.plot(SD402_df['Time'], SD402_df['Position'], color = 'black', label = '400g mass 2')
-p3 = ax.plot(SD403_df['Time'], SD403_df['Position'], color = 'red', label = '400g mass 3')
+
+p1 = ax[0,0].plot(SD101_df['Time'], SD101_df['Position'], color = 'blue', label = '100g Mass 1')
+p2 = ax[0,0].plot(SD102_df['Time'], SD102_df['Position'], color = 'black', label = '100g mass 2')
+p3 = ax[0,0].plot(SD103_df['Time'], SD103_df['Position'], color = 'red', label = '100g mass 3')
 #p2 = ax.plot(ddate, fit, color = 'black', label = 'Linear Fit')
 #p3 = ax.fill_between(ddate, fit-PI_68, fit+PI_68, color = 'orange', label = r'1$\sigma$ PI')
 #p4 = ax.fill_between(ddate, fit-CI_95, fit+CI_95, color = 'yellow', label = r'2$\sigma$ CI')
-ax.set_ylabel(r'Position in Volts (Radians)', color=txt, fontsize=16)
-ax.set_xlabel(r'Time', color=txt, fontsize=16)
-ax.set_title(r'Torsional Oscillator String Damping - Position vs Time 400g Trials', color=txt, fontsize = 18)
-ax.tick_params(axis='x', labelsize=16, colors=txt)
-ax.tick_params(axis='y', labelsize=16, colors=txt)
-ax.legend(loc='lower right')
+ax[0,0].set_ylabel(r'Position in Volts (Radians)', color=txt, fontsize=12)
+ax[0,0].set_xlabel(r'Time', color=txt, fontsize=12)
+ax[0,0].set_title(r'TO. String Damping - Position vs Time 200g Trials', color=txt, fontsize = 14)
+ax[0,0].tick_params(axis='x', labelsize=12, colors=txt)
+ax[0,0].tick_params(axis='y', labelsize=12, colors=txt)
+ax[0,0].legend(loc='lower right')
+
+p1 = ax[0,1].plot(SD201_df['Time'], SD201_df['Position'], color = 'blue', label = '200g Mass 1')
+p2 = ax[0,1].plot(SD202_df['Time'], SD202_df['Position'], color = 'black', label = '200g mass 2')
+p3 = ax[0,1].plot(SD203_df['Time'], SD203_df['Position'], color = 'red', label = '200g mass 3')
+#p2 = ax.plot(ddate, fit, color = 'black', label = 'Linear Fit')
+#p3 = ax.fill_between(ddate, fit-PI_68, fit+PI_68, color = 'orange', label = r'1$\sigma$ PI')
+#p4 = ax.fill_between(ddate, fit-CI_95, fit+CI_95, color = 'yellow', label = r'2$\sigma$ CI')
+ax[0,1].set_ylabel(r'Position in Volts (Radians)', color=txt, fontsize=16)
+ax[0,1].set_xlabel(r'Time', color=txt, fontsize=16)
+ax[0,1].set_title(r'TO. String Damping - Position vs Time 200g Trials', color=txt, fontsize = 18)
+ax[0,1].tick_params(axis='x', labelsize=16, colors=txt)
+ax[0,1].tick_params(axis='y', labelsize=16, colors=txt)
+ax[0,1].legend(loc='lower right')
+
+p1 = ax[1,0].plot(SD301_df['Time'], SD301_df['Position'], color = 'blue', label = '300g Mass 1')
+p2 = ax[1,0].plot(SD302_df['Time'], SD302_df['Position'], color = 'black', label = '300g mass 2')
+p3 = ax[1,0].plot(SD303_df['Time'], SD303_df['Position'], color = 'red', label = '300g mass 3')
+#p2 = ax.plot(ddate, fit, color = 'black', label = 'Linear Fit')
+#p3 = ax.fill_between(ddate, fit-PI_68, fit+PI_68, color = 'orange', label = r'1$\sigma$ PI')
+#p4 = ax.fill_between(ddate, fit-CI_95, fit+CI_95, color = 'yellow', label = r'2$\sigma$ CI')
+ax[1,0].set_ylabel(r'Position in Volts (Radians)', color=txt, fontsize=16)
+ax[1,0].set_xlabel(r'Time', color=txt, fontsize=16)
+ax[1,0].set_title(r'TO String Damping - Position vs Time 300g Trials', color=txt, fontsize = 18)
+ax[1,0].tick_params(axis='x', labelsize=16, colors=txt)
+ax[1,0].tick_params(axis='y', labelsize=16, colors=txt)
+ax[1,0].legend(loc='lower right')
+
+p1 = ax[1,1].plot(SD401_df['Time'], SD401_df['Position'], color = 'blue', label = '400g Mass 1')
+p2 = ax[1,1].plot(SD402_df['Time'], SD402_df['Position'], color = 'black', label = '400g mass 2')
+p3 = ax[1,1].plot(SD403_df['Time'], SD403_df['Position'], color = 'red', label = '400g mass 3')
+#p2 = ax.plot(ddate, fit, color = 'black', label = 'Linear Fit')
+#p3 = ax.fill_between(ddate, fit-PI_68, fit+PI_68, color = 'orange', label = r'1$\sigma$ PI')
+#p4 = ax.fill_between(ddate, fit-CI_95, fit+CI_95, color = 'yellow', label = r'2$\sigma$ CI')
+ax[1,1].set_ylabel(r'Position in Volts (Radians)', color=txt, fontsize=16)
+ax[1,1].set_xlabel(r'Time', color=txt, fontsize=16)
+ax[1,1].set_title(r'TO String Damping - Position vs Time 400g Trials', color=txt, fontsize = 18)
+ax[1,1].tick_params(axis='x', labelsize=16, colors=txt)
+ax[1,1].tick_params(axis='y', labelsize=16, colors=txt)
+ax[1,1].legend(loc='lower right')
+
+
 plt.rcParams["figure.figsize"] = (16,9)
 plt.show()
 
@@ -516,30 +620,25 @@ MD02_df = deleteRowsDF(0.64,MD02_df,'Time') #drop extra rows before oscilation s
 MD03_df = driveSheetToDF(sheet_id, "magdamping03")
 MD03_df = deleteRowsDF(1.28,MD03_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
 
-#%%
+#Copied from Terry's Python_Plot&DataAnalysis.ipynb
+
 fig, ax = plt.subplots()
 txt = 'black'
-p1 = ax.plot(MD01_df['Time'], MD01_df['Position'], color = 'blue', label = 'Magnetic Damping 0 turns 1')
-p2 = ax.plot(MD02_df['Time'], MD02_df['Position'], color = 'black', label = 'Magnetic Damping 0 turns 2')
-p3 = ax.plot(MD03_df['Time'], MD03_df['Position'], color = 'red', label = 'Magnetic Damping 0 turns 3')
+p1 = ax.plot(MD01_df['Time'], MD01_df['Position'], color = 'blue', label = '100g Mass')
+p2 = ax.plot(MD02_df['Time'], MD02_df['Position'], color = 'black', label = '200g mass')
+p3 = ax.plot(MD03_df['Time'], MD03_df['Position'], color = 'red', label = '300g mass')
+#p4 = ax.plot(SD401_df['Time'], SD401_df['Position'], color = 'green', label = '400g mass')
 #p2 = ax.plot(ddate, fit, color = 'black', label = 'Linear Fit')
 #p3 = ax.fill_between(ddate, fit-PI_68, fit+PI_68, color = 'orange', label = r'1$\sigma$ PI')
 #p4 = ax.fill_between(ddate, fit-CI_95, fit+CI_95, color = 'yellow', label = r'2$\sigma$ CI')
 ax.set_ylabel(r'Position in Volts (Radians)', color=txt, fontsize=16)
 ax.set_xlabel(r'Time', color=txt, fontsize=16)
-ax.set_title(r'Torsional Oscillator Magnetic Damping - Position vs Time 0 Turns', color=txt, fontsize = 18)
+ax.set_title(r'Torsional Oscillator Magnetic Damping 0 Turns - Position vs Time', color=txt, fontsize = 18)
 ax.tick_params(axis='x', labelsize=16, colors=txt)
 ax.tick_params(axis='y', labelsize=16, colors=txt)
 ax.legend(loc='lower right')
 plt.rcParams["figure.figsize"] = (16,9)
 plt.show()
-
-"""After results from 8.25, we decided 11 Full turns of the magnetic dampers was not worthwile.
-
-We may want some data at 1 turns, 2 turns, 3 turns, 4 turns. etc.
-"""
-
-#%% cell break
 
 #magdamping2751
 
@@ -588,7 +687,6 @@ MD8252_df = deleteRowsDF(0.86,MD8252_df,'Time') #drop extra rows before oscilati
 MD8253_df = driveSheetToDF(sheet_id, "magdamping8253")
 MD8253_df = deleteRowsDF(0.78,MD8253_df,'Time') #drop extra rows before oscilation starts and set time to reflect dropped rows.
 
-#%%
 fig, ax = plt.subplots()
 txt = 'black'
 p1 = ax.plot(MD01_df['Time'], MD01_df['Position'], label = 'Magnetic Damping 0 turns')
@@ -618,3 +716,4 @@ We may want some data at 1 turns, 2 turns, 3 turns, 4 turns. etc.
 
 """
 
+#40cm + 1.27 cm radius of
